@@ -5,6 +5,7 @@ import { highlightChangesInLine } from './highlightChangesInLine';
 import { highlightSyntaxInLine } from './highlightSyntaxInLine';
 import { iterFitTextToWidth } from './iterFitTextToWidth';
 import { ThemeColor } from './themes';
+import { createEditorLink } from './editorLinks';
 
 // Assuming people aren't editing lines >=100k lines
 const LINE_NUMBER_WIDTH = 5;
@@ -81,15 +82,31 @@ export async function* formatAndFitHunkLine(
         formattedLine,
         lineTextWidth
     )) {
-        const lineNoText =
-            (isFirstLine ? lineNo.toString() : '').padStart(LINE_NUMBER_WIDTH) +
-            ' ';
         const wrappedLinePrefix = (isFirstLine ? linePrefix : '')
             .padStart(2)
             .padEnd(3);
 
-        const hunkLine = T()
-            .appendString(lineNoText, lineNoColor)
+        const hunkLine = T();
+
+        if (isFirstLine) {
+            // Create hyperlinked line number with only the number hyperlinked, not the padding
+            const lineNoStr = lineNo.toString();
+            const padding = ''.padStart(LINE_NUMBER_WIDTH - lineNoStr.length);
+            hunkLine.appendString(padding);
+            const hyperlinkedLineNo = createEditorLink(
+                fileName,
+                lineNo,
+                1,
+                lineNoStr
+            );
+            hunkLine.appendString(hyperlinkedLineNo + ' ');
+        } else {
+            // Empty line number for wrapped lines
+            const lineNoText = ''.padStart(LINE_NUMBER_WIDTH) + ' ';
+            hunkLine.appendString(lineNoText, lineNoColor);
+        }
+
+        hunkLine
             .appendString(wrappedLinePrefix)
             .appendSpannedString(fittedLine);
         hunkLine.addSpan(0, hunkLine.getString().length, lineColor);
