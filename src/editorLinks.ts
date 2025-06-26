@@ -1,10 +1,27 @@
-import chalk from 'chalk';
 import * as path from 'path';
 
-export function createEditorLink(filePath: string, line = 1, column = 1, customDisplay: string | null = null): string {
+export function createEditorLink(
+    filePath: string,
+    line = 1,
+    column = 1,
+    customDisplay: string | null = null
+): string {
     const absolutePath = path.resolve(filePath);
     const url = `cursor://file${absolutePath}:${line}:${column}`;
-    const display = customDisplay ? customDisplay : `${path.basename(filePath)}:${line}`;
-    
-    return `\x1b]8;;${url}\x1b\\${chalk.cyanBright(display)}\x1b]8;;\x1b\\`;
+    const display = customDisplay
+        ? customDisplay
+        : `${path.basename(filePath)}:${line}`;
+
+    // Return a special marker that will be replaced with ANSI escape sequences later
+    return `__EDITOR_LINK__${url}__${display}__EDITOR_LINK_END__`;
+}
+
+/**
+ * Replaces editor link markers with actual ANSI escape sequences
+ */
+export function replaceEditorLinks(text: string): string {
+    const linkRegex = /__EDITOR_LINK__([^_]+)__([^_]+)__EDITOR_LINK_END__/g;
+    return text.replace(linkRegex, (match, url, display) => {
+        return `\x1b]8;;${url}\x1b\\${display}\x1b]8;;\x1b\\`;
+    });
 }

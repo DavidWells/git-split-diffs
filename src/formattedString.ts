@@ -1,6 +1,7 @@
 import { Context } from './context';
 import { SpannedString } from './SpannedString';
 import { reduceThemeColors, ThemeColor } from './themes';
+import { replaceEditorLinks } from './editorLinks';
 
 export class FormattedString extends SpannedString<ThemeColor> {}
 
@@ -41,5 +42,7 @@ export function applyFormatting(
         }
         formattedString += formattedSubstring;
     }
-    return formattedString;
+
+    // Replace editor link markers with actual ANSI escape sequences
+    return replaceEditorLinks(formattedString);
 }
