@@ -87,18 +87,25 @@ export async function* formatAndFitHunkLine(
             .padEnd(3);
 
         const hunkLine = T();
-        
+
         if (isFirstLine) {
-            // Create hyperlinked line number
-            const lineNoTextPlain = lineNo.toString().padStart(LINE_NUMBER_WIDTH);
-            const hyperlinkedLineNo = createEditorLink(fileName, lineNo, 1, lineNoTextPlain);
+            // Create hyperlinked line number with only the number hyperlinked, not the padding
+            const lineNoStr = lineNo.toString();
+            const padding = ''.padStart(LINE_NUMBER_WIDTH - lineNoStr.length);
+            hunkLine.appendString(padding);
+            const hyperlinkedLineNo = createEditorLink(
+                fileName,
+                lineNo,
+                1,
+                lineNoStr
+            );
             hunkLine.appendString(hyperlinkedLineNo + ' ');
         } else {
             // Empty line number for wrapped lines
             const lineNoText = ''.padStart(LINE_NUMBER_WIDTH) + ' ';
             hunkLine.appendString(lineNoText, lineNoColor);
         }
-        
+
         hunkLine
             .appendString(wrappedLinePrefix)
             .appendSpannedString(fittedLine);

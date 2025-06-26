@@ -35,6 +35,7 @@
         "wcwidth": "^1.0.1"
     },
     "scripts": {
+        "local": "git -c core.pager='node ./build/index.mjs --color | cat' diff main -- . ':!package-lock.json' ':!yarn.lock' ':!pnpm-lock.yaml' ':!bun.lockb' && echo -e '\\nFiles changed:\\n'",
         "clean": "rimraf './build'",
         "lint": "cross-env ./node_modules/.bin/eslint src scripts",
         "build": "npm run clean && node ./scripts/build.mjs",
