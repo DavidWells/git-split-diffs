@@ -1,5 +1,7 @@
 # git-split-diffs
 
+Fork of https://github.com/banga/git-split-diffs with clickable links
+
 GitHub style split (side by side) diffs with syntax highlighting in your terminal.
 
 ![Screenshot of dark theme](screenshots/dark.png?raw=true)
