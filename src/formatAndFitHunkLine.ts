@@ -92,14 +92,14 @@ export async function* formatAndFitHunkLine(
             // Create hyperlinked line number with only the number hyperlinked, not the padding
             const lineNoStr = lineNo.toString();
             const padding = ''.padStart(LINE_NUMBER_WIDTH - lineNoStr.length);
-            hunkLine.appendString(padding);
+            hunkLine.appendString(padding, lineNoColor);
             const hyperlinkedLineNo = createEditorLink(
                 fileName,
                 lineNo,
                 1,
                 lineNoStr
             );
-            hunkLine.appendString(hyperlinkedLineNo + ' ');
+            hunkLine.appendString(hyperlinkedLineNo + ' ', lineNoColor);
         } else {
             // Empty line number for wrapped lines
             const lineNoText = ''.padStart(LINE_NUMBER_WIDTH) + ' ';

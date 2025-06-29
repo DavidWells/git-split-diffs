@@ -20,7 +20,7 @@ export function createEditorLink(
  * Replaces editor link markers with actual ANSI escape sequences
  */
 export function replaceEditorLinks(text: string): string {
-    const linkRegex = /__EDITOR_LINK__([^_]+)__([^_]+)__EDITOR_LINK_END__/g;
+    const linkRegex = /__EDITOR_LINK__(.+?)__(.+?)__EDITOR_LINK_END__/g;
     return text.replace(linkRegex, (match, url, display) => {
         return `\x1b]8;;${url}\x1b\\${display}\x1b]8;;\x1b\\`;
     });
