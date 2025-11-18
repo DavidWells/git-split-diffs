@@ -48,6 +48,16 @@ export interface FormatDiffOptions {
    * Git repository root directory. Used to resolve file paths for editor links.
    */
   gitRootDir?: string;
+
+  /**
+   * Whether to add hyperlinks to file names. Defaults to true.
+   */
+  hyperlinkFileNames?: boolean;
+
+  /**
+   * Whether to add hyperlinks to line numbers. Defaults to true.
+   */
+  hyperlinkLineNumbers?: boolean;
 }
 
 /**
@@ -69,6 +79,8 @@ export async function formatDiff(
     themeName = 'dark',
     syntaxHighlightingTheme,
     gitRootDir,
+    hyperlinkFileNames = true,
+    hyperlinkLineNumbers = true,
   } = options;
 
   // Create config with options
@@ -79,6 +91,8 @@ export async function formatDiff(
     WRAP_LINES: wrapLines,
     HIGHLIGHT_LINE_CHANGES: highlightLineChanges,
     SYNTAX_HIGHLIGHTING_THEME: syntaxHighlightingTheme,
+    HYPERLINK_FILE_NAMES: hyperlinkFileNames,
+    HYPERLINK_LINE_NUMBERS: hyperlinkLineNumbers,
   });
 
   // Create context

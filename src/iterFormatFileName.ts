@@ -62,16 +62,28 @@ export function* iterFormatFileName(
 
     // Now create linked version of the (possibly truncated) text
     let fileNameLabel;
+    const shouldHyperlink = context.HYPERLINK_FILE_NAMES !== false;
+
     if (!fileNameA) {
-        fileNameLabel = createFileLink(fileNameB, context.GIT_ROOT);
+        fileNameLabel = shouldHyperlink
+            ? createFileLink(fileNameB, context.GIT_ROOT)
+            : fileNameB;
     } else if (!fileNameB) {
-        fileNameLabel = createFileLink(fileNameA, context.GIT_ROOT);
+        fileNameLabel = shouldHyperlink
+            ? createFileLink(fileNameA, context.GIT_ROOT)
+            : fileNameA;
     } else if (fileNameA === fileNameB) {
-        fileNameLabel = createFileLink(fileNameA, context.GIT_ROOT);
+        fileNameLabel = shouldHyperlink
+            ? createFileLink(fileNameA, context.GIT_ROOT)
+            : fileNameA;
     } else {
-        const linkA = createFileLink(fileNameA, context.GIT_ROOT);
-        const linkB = createFileLink(fileNameB, context.GIT_ROOT);
-        fileNameLabel = `${linkA} -> ${linkB}`;
+        if (shouldHyperlink) {
+            const linkA = createFileLink(fileNameA, context.GIT_ROOT);
+            const linkB = createFileLink(fileNameB, context.GIT_ROOT);
+            fileNameLabel = `${linkA} -> ${linkB}`;
+        } else {
+            fileNameLabel = `${fileNameA} -> ${fileNameB}`;
+        }
     }
 
     formattedString.appendString(fileNameLabel);

@@ -93,14 +93,13 @@ export async function* formatAndFitHunkLine(
             const lineNoStr = lineNo.toString();
             const padding = ''.padStart(LINE_NUMBER_WIDTH - lineNoStr.length);
             hunkLine.appendString(padding, lineNoColor);
-            const hyperlinkedLineNo = createEditorLink(
-                fileName,
-                lineNo,
-                1,
-                lineNoStr,
-                context.GIT_ROOT
-            );
-            hunkLine.appendString(hyperlinkedLineNo + ' ', lineNoColor);
+
+            const shouldHyperlink = context.HYPERLINK_LINE_NUMBERS !== false;
+            const lineNoContent = shouldHyperlink
+                ? createEditorLink(fileName, lineNo, 1, lineNoStr, context.GIT_ROOT)
+                : lineNoStr;
+
+            hunkLine.appendString(lineNoContent + ' ', lineNoColor);
         } else {
             // Empty line number for wrapped lines
             const lineNoText = ''.padStart(LINE_NUMBER_WIDTH) + ' ';
