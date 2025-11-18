@@ -1,5 +1,24 @@
 import * as path from 'path';
 
+/**
+ * Creates a simple file path hyperlink using file:// protocol
+ */
+export function createFileLink(
+    filePath: string,
+    gitRoot?: string
+): string {
+    // If we have a git root, resolve paths relative to it
+    // Otherwise fall back to resolving from cwd
+    const absolutePath = gitRoot
+        ? path.resolve(gitRoot, filePath)
+        : path.resolve(filePath);
+
+    const url = `file://${absolutePath}`;
+
+    // Return a special marker that will be replaced with ANSI escape sequences later
+    return `__FILE_LINK__${url}__${filePath}__FILE_LINK_END__`;
+}
+
 export function createEditorLink(
     filePath: string,
     line = 1,
@@ -24,10 +43,30 @@ export function createEditorLink(
 
 /**
  * Replaces editor link markers with actual ANSI escape sequences
+ * The regex needs to handle ANSI color codes that might be inserted by chalk
  */
 export function replaceEditorLinks(text: string): string {
-    const linkRegex = /__EDITOR_LINK__(.+?)__(.+?)__EDITOR_LINK_END__/g;
-    return text.replace(linkRegex, (match, url, display) => {
-        return `\x1b]8;;${url}\x1b\\${display}\x1b]8;;\x1b\\`;
+    // Pattern that matches any character including ANSI escape codes
+    // (?:\x1b\[[0-9;]*m)? optionally matches ANSI color codes
+    const ansiPattern = '(?:[\\s\\S]|(?:\\x1b\\[[0-9;]*m))+?';
+
+    // Replace file links - pattern handles ANSI codes between delimiters
+    const fileLinkRegex = new RegExp(`__FILE_LINK__(${ansiPattern})__(${ansiPattern})__FILE_LINK_END__`, 'g');
+    text = text.replace(fileLinkRegex, (match, url, display) => {
+        // Strip ANSI codes from url and display to get clean values
+        const cleanUrl = url.replace(/\x1b\[[0-9;]*m/g, '');
+        const cleanDisplay = display.replace(/\x1b\[[0-9;]*m/g, '');
+        return `\x1b]8;;${cleanUrl}\x1b\\${cleanDisplay}\x1b]8;;\x1b\\`;
     });
+
+    // Replace editor links (for line numbers)
+    const editorLinkRegex = new RegExp(`__EDITOR_LINK__(${ansiPattern})__(${ansiPattern})__EDITOR_LINK_END__`, 'g');
+    text = text.replace(editorLinkRegex, (match, url, display) => {
+        // Strip ANSI codes from url and display to get clean values
+        const cleanUrl = url.replace(/\x1b\[[0-9;]*m/g, '');
+        const cleanDisplay = display.replace(/\x1b\[[0-9;]*m/g, '');
+        return `\x1b]8;;${cleanUrl}\x1b\\${cleanDisplay}\x1b]8;;\x1b\\`;
+    });
+
+    return text;
 }

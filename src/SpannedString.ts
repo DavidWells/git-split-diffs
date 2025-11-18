@@ -177,19 +177,57 @@ export class SpannedString<T> {
     /**
      * Returns the screen width of the string in columns, i.e. accounting for
      * characters that may occupy more than one character width in the terminal.
+     * Link markers are excluded from width calculation.
      */
     getWidth(): number {
-        return wcwidth(this._string);
+        return this.getCharWidths().reduce((a, b) => a + b, 0);
     }
 
     /**
      * Returns the screen width per character.
+     * Editor link and file link markers are treated as zero-width.
      */
     getCharWidths(): number[] {
         const charWidths: number[] = [];
-        for (const char of this._string) {
-            charWidths.push(wcwidth(char));
+        let insideMarker = false;
+        let markerBuffer = '';
+        const markerStart = ['__EDITOR_LINK__', '__FILE_LINK__'];
+        const markerEnd = ['__EDITOR_LINK_END__', '__FILE_LINK_END__'];
+
+        for (let i = 0; i < this._string.length; i++) {
+            const char = this._string[i];
+
+            if (!insideMarker) {
+                markerBuffer += char;
+
+                // Check if we're at the start of any marker
+                const foundMarker = markerStart.find(marker => markerBuffer.endsWith(marker));
+                if (foundMarker) {
+                    insideMarker = true;
+                    // Set width to 0 for all characters in the marker we just detected
+                    for (let j = 0; j < foundMarker.length; j++) {
+                        charWidths[charWidths.length - foundMarker.length + j] = 0;
+                    }
+                    markerBuffer = '';
+                } else {
+                    charWidths.push(wcwidth(char));
+                    // Keep buffer to last 20 chars to detect marker start
+                    if (markerBuffer.length > 20) {
+                        markerBuffer = markerBuffer.slice(-20);
+                    }
+                }
+            } else {
+                markerBuffer += char;
+                charWidths.push(0); // Zero width for marker content
+
+                // Check if we're at the end of any marker
+                if (markerEnd.some(marker => markerBuffer.endsWith(marker))) {
+                    insideMarker = false;
+                    markerBuffer = '';
+                }
+            }
         }
+
         return charWidths;
     }
 
