@@ -12,6 +12,11 @@ const DEFAULT_CONFIG: GitConfig = {
     MIN_LINE_WIDTH: DEFAULT_MIN_LINE_WIDTH,
     THEME_NAME: DEFAULT_THEME_NAME,
     THEME_DIRECTORY: DEFAULT_THEME_DIRECTORY,
+    HYPERLINK_FILE_NAMES: true,
+    HYPERLINK_LINE_NUMBERS: true,
+    HIDE_FILE_HEADER: false,
+    OMIT_HUNK_HEADERS: false,
+    TRIM_LAST_EMPTY_LINE: true,
 };
 
 describe('getGitConfig', () => {
@@ -36,6 +41,11 @@ split-diffs.syntax-highlighting-theme=dark-plus
             THEME_NAME: 'arctic',
             THEME_DIRECTORY: '/tmp',
             SYNTAX_HIGHLIGHTING_THEME: 'dark-plus',
+            HYPERLINK_FILE_NAMES: true,
+            HYPERLINK_LINE_NUMBERS: true,
+            HIDE_FILE_HEADER: false,
+            OMIT_HUNK_HEADERS: false,
+            TRIM_LAST_EMPTY_LINE: true,
         });
     });
 

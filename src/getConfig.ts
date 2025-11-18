@@ -6,6 +6,11 @@ export type Config = Theme & {
     MIN_LINE_WIDTH: number;
     WRAP_LINES: boolean;
     HIGHLIGHT_LINE_CHANGES: boolean;
+    HYPERLINK_FILE_NAMES?: boolean;
+    HYPERLINK_LINE_NUMBERS?: boolean;
+    HIDE_FILE_HEADER?: boolean;
+    OMIT_HUNK_HEADERS?: boolean;
+    TRIM_LAST_EMPTY_LINE?: boolean;
 };
 
 export const CONFIG_DEFAULTS: Omit<Config, keyof Theme> = {
