@@ -68,6 +68,11 @@ export interface FormatDiffOptions {
    * Whether to omit hunk headers (the @@ lines). Defaults to false.
    */
   omitHunkHeaders?: boolean;
+
+  /**
+   * Whether to trim trailing empty lines from hunks. Defaults to true.
+   */
+  trimLastEmptyLine?: boolean;
 }
 
 /**
@@ -93,6 +98,7 @@ export async function formatDiff(
     hyperlinkLineNumbers = true,
     hideFileHeader = false,
     omitHunkHeaders = false,
+    trimLastEmptyLine = true,
   } = options;
 
   // Create config with options
@@ -107,6 +113,7 @@ export async function formatDiff(
     HYPERLINK_LINE_NUMBERS: hyperlinkLineNumbers,
     HIDE_FILE_HEADER: hideFileHeader,
     OMIT_HUNK_HEADERS: omitHunkHeaders,
+    TRIM_LAST_EMPTY_LINE: trimLastEmptyLine,
   });
 
   // Create context

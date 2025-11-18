@@ -53,11 +53,48 @@ export async function* iterFormatHunk(
     // Only split diffs if there's enough room
     const splitDiffs = SCREEN_WIDTH >= MIN_LINE_WIDTH * hunkParts.length;
 
+    // Collect all hunk lines
+    let hunkLines: FormattedString[] = [];
     if (splitDiffs) {
-        yield* iterFormatHunkSplit(context, hunkParts, changes);
+        for await (const line of iterFormatHunkSplit(context, hunkParts, changes)) {
+            hunkLines.push(line);
+        }
     } else if (diffType === 'unified-diff') {
-        yield* iterFormatUnifiedDiffHunkUnified(context, hunkParts, changes);
+        for await (const line of iterFormatUnifiedDiffHunkUnified(context, hunkParts, changes)) {
+            hunkLines.push(line);
+        }
     } else if (diffType === 'combined-diff') {
-        yield* iterFormatCombinedDiffHunkUnified(context, hunkParts, changes);
+        for await (const line of iterFormatCombinedDiffHunkUnified(context, hunkParts, changes)) {
+            hunkLines.push(line);
+        }
+    }
+
+    // Trim last empty lines if enabled
+    if (context.TRIM_LAST_EMPTY_LINE) {
+        while (hunkLines.length > 0) {
+            const lastLine = hunkLines[hunkLines.length - 1];
+            let lineText = lastLine.getString();
+
+            // Strip ANSI escape codes (colors)
+            lineText = lineText.replace(/\x1b\[[0-9;]*m/g, '');
+            // Strip hyperlink markers
+            lineText = lineText.replace(/__(?:EDITOR|FILE)_LINK__[^]*?__(?:EDITOR|FILE)_LINK_END__/g, '');
+            // Strip OSC 8 hyperlinks
+            lineText = lineText.replace(/\x1b\]8;;[^\x1b]*\x1b\\/g, '');
+
+            // Now check if what's left is just whitespace and/or digits (line numbers)
+            const contentOnly = lineText.replace(/[\s\d]/g, '');
+
+            if (contentOnly.length === 0) {
+                hunkLines.pop();
+            } else {
+                break;
+            }
+        }
+    }
+
+    // Yield the (possibly trimmed) lines
+    for (const line of hunkLines) {
+        yield line;
     }
 }
