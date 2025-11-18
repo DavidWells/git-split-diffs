@@ -2,6 +2,7 @@ import * as shiki from 'shiki';
 import { Config } from './getConfig';
 import { FormattedString, T } from './formattedString';
 import { ChalkInstance } from 'chalk';
+import { hyperlinkSupported } from './editorLinks';
 
 /**
  * Internal context object used to pass around config and config-derived
@@ -13,6 +14,7 @@ export type Context = Config & {
     HORIZONTAL_SEPARATOR: FormattedString;
     HIGHLIGHTER?: shiki.Highlighter;
     GIT_ROOT?: string;
+    HYPERLINK_SUPPORTED: boolean;
 };
 
 export async function getContextForConfig(
@@ -41,5 +43,6 @@ export async function getContextForConfig(
         HORIZONTAL_SEPARATOR,
         HIGHLIGHTER,
         GIT_ROOT: gitRoot,
+        HYPERLINK_SUPPORTED: hyperlinkSupported(),
     };
 }

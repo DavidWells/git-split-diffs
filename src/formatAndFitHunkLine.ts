@@ -94,7 +94,7 @@ export async function* formatAndFitHunkLine(
             const padding = ''.padStart(LINE_NUMBER_WIDTH - lineNoStr.length);
             hunkLine.appendString(padding, lineNoColor);
 
-            const shouldHyperlink = context.HYPERLINK_LINE_NUMBERS !== false;
+            const shouldHyperlink = context.HYPERLINK_LINE_NUMBERS !== false && context.HYPERLINK_SUPPORTED;
             const lineNoContent = shouldHyperlink
                 ? createEditorLink(fileName, lineNo, 1, lineNoStr, context.GIT_ROOT)
                 : lineNoStr;

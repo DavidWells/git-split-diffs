@@ -68,7 +68,7 @@ export function* iterFormatFileName(
 
     // Now create linked version of the (possibly truncated) text
     let fileNameLabel;
-    const shouldHyperlink = context.HYPERLINK_FILE_NAMES !== false;
+    const shouldHyperlink = context.HYPERLINK_FILE_NAMES !== false && context.HYPERLINK_SUPPORTED;
 
     if (!fileNameA) {
         fileNameLabel = shouldHyperlink
