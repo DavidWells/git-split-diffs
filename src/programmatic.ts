@@ -43,6 +43,11 @@ export interface FormatDiffOptions {
    * Syntax highlighting theme. Optional.
    */
   syntaxHighlightingTheme?: string;
+
+  /**
+   * Git repository root directory. Used to resolve file paths for editor links.
+   */
+  gitRootDir?: string;
 }
 
 /**
@@ -63,6 +68,7 @@ export async function formatDiff(
     highlightLineChanges = true,
     themeName = 'dark',
     syntaxHighlightingTheme,
+    gitRootDir,
   } = options;
 
   // Create config with options
@@ -76,7 +82,7 @@ export async function formatDiff(
   });
 
   // Create context
-  const context = await getContextForConfig(config, chalk, width);
+  const context = await getContextForConfig(config, chalk, width, gitRootDir);
 
   // Create readable stream from diff content
   const inputStream = Readable.from([diffContent]);

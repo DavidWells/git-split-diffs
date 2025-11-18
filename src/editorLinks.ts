@@ -4,9 +4,15 @@ export function createEditorLink(
     filePath: string,
     line = 1,
     column = 1,
-    customDisplay: string | null = null
+    customDisplay: string | null = null,
+    gitRoot?: string
 ): string {
-    const absolutePath = path.resolve(filePath);
+    // If we have a git root, resolve paths relative to it
+    // Otherwise fall back to resolving from cwd
+    const absolutePath = gitRoot
+        ? path.resolve(gitRoot, filePath)
+        : path.resolve(filePath);
+
     const url = `cursor://file${absolutePath}:${line}:${column}`;
     const display = customDisplay
         ? customDisplay

@@ -97,7 +97,8 @@ export async function* formatAndFitHunkLine(
                 fileName,
                 lineNo,
                 1,
-                lineNoStr
+                lineNoStr,
+                context.GIT_ROOT
             );
             hunkLine.appendString(hyperlinkedLineNo + ' ', lineNoColor);
         } else {

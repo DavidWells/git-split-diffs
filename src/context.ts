@@ -12,12 +12,14 @@ export type Context = Config & {
     SCREEN_WIDTH: number;
     HORIZONTAL_SEPARATOR: FormattedString;
     HIGHLIGHTER?: shiki.Highlighter;
+    GIT_ROOT?: string;
 };
 
 export async function getContextForConfig(
     config: Config,
     chalk: ChalkInstance,
-    screenWidth: number
+    screenWidth: number,
+    gitRoot?: string
 ): Promise<Context> {
     const SCREEN_WIDTH = screenWidth;
 
@@ -38,5 +40,6 @@ export async function getContextForConfig(
         SCREEN_WIDTH,
         HORIZONTAL_SEPARATOR,
         HIGHLIGHTER,
+        GIT_ROOT: gitRoot,
     };
 }
