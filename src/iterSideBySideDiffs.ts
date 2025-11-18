@@ -48,15 +48,18 @@ async function* iterSideBySideDiffsFormatted(
     // File metadata
     let fileNameA: string = '';
     let fileNameB: string = '';
+    let hunkIndex = 0;
     function* yieldFileName() {
         yield* iterFormatFileName(context, fileNameA, fileNameB);
+        hunkIndex = 0; // Reset hunk counter for new file
     }
 
     // Hunk metadata
     let hunkParts: HunkPart[] = [];
     let hunkHeaderLine: string = '';
     async function* yieldHunk(diffType: 'unified-diff' | 'combined-diff') {
-        yield* iterFormatHunk(context, diffType, hunkHeaderLine, hunkParts);
+        yield* iterFormatHunk(context, diffType, hunkHeaderLine, hunkParts, hunkIndex);
+        hunkIndex++;
         for (const hunkPart of hunkParts) {
             hunkPart.startLineNo = -1;
             hunkPart.lines = [];

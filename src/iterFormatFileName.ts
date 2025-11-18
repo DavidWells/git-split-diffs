@@ -15,7 +15,13 @@ export function* iterFormatFileName(
         DELETED_LINE_NO_COLOR,
         FILE_NAME_COLOR,
         SCREEN_WIDTH,
+        HIDE_FILE_HEADER,
     } = context;
+
+    // If hiding file header, return early
+    if (HIDE_FILE_HEADER) {
+        return;
+    }
 
     yield HORIZONTAL_SEPARATOR;
 

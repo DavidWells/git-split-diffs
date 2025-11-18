@@ -10,6 +10,8 @@ export type GitConfig = {
     SYNTAX_HIGHLIGHTING_THEME?: string;
     HYPERLINK_FILE_NAMES?: boolean;
     HYPERLINK_LINE_NUMBERS?: boolean;
+    HIDE_FILE_HEADER?: boolean;
+    OMIT_HUNK_HEADERS?: boolean;
 };
 
 export const DEFAULT_MIN_LINE_WIDTH = 80;
@@ -61,5 +63,7 @@ export function getGitConfig(configString: string): GitConfig {
         SYNTAX_HIGHLIGHTING_THEME: rawConfig['syntax-highlighting-theme'],
         HYPERLINK_FILE_NAMES: rawConfig['hyperlink-file-names'] !== 'false',
         HYPERLINK_LINE_NUMBERS: rawConfig['hyperlink-line-numbers'] !== 'false',
+        HIDE_FILE_HEADER: rawConfig['hide-file-header'] === 'true',
+        OMIT_HUNK_HEADERS: rawConfig['omit-hunk-headers'] === 'true',
     };
 }

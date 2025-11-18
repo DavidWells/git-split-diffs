@@ -18,16 +18,30 @@ export async function* iterFormatHunk(
     context: Context,
     diffType: 'unified-diff' | 'combined-diff',
     hunkHeaderLine: string,
-    hunkParts: HunkPart[]
+    hunkParts: HunkPart[],
+    hunkIndex: number = 0
 ): AsyncIterable<FormattedString> {
-    const { HUNK_HEADER_COLOR, SCREEN_WIDTH, MIN_LINE_WIDTH } = context;
+    const { HUNK_HEADER_COLOR, SCREEN_WIDTH, MIN_LINE_WIDTH, OMIT_HUNK_HEADERS } = context;
 
-    yield* iterFitTextToWidth(
-        context,
-        T().appendString(hunkHeaderLine),
-        SCREEN_WIDTH,
-        HUNK_HEADER_COLOR
-    );
+    // Handle hunk headers based on omit setting
+    if (!OMIT_HUNK_HEADERS) {
+        // Show full hunk header normally
+        yield* iterFitTextToWidth(
+            context,
+            T().appendString(hunkHeaderLine),
+            SCREEN_WIDTH,
+            HUNK_HEADER_COLOR
+        );
+    } else if (hunkIndex > 0) {
+        // When omitting, show "..." for subsequent hunks (not the first)
+        yield* iterFitTextToWidth(
+            context,
+            T().appendString('   ...'),
+            SCREEN_WIDTH,
+            HUNK_HEADER_COLOR
+        );
+    }
+    // First hunk (hunkIndex === 0) with OMIT_HUNK_HEADERS: output nothing
 
     // TODO: Fix to handle multiple hunk parts
     const changes = getChangesInLines(

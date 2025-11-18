@@ -58,6 +58,16 @@ export interface FormatDiffOptions {
    * Whether to add hyperlinks to line numbers. Defaults to true.
    */
   hyperlinkLineNumbers?: boolean;
+
+  /**
+   * Whether to hide the file header (separator lines and filename). Defaults to false.
+   */
+  hideFileHeader?: boolean;
+
+  /**
+   * Whether to omit hunk headers (the @@ lines). Defaults to false.
+   */
+  omitHunkHeaders?: boolean;
 }
 
 /**
@@ -81,6 +91,8 @@ export async function formatDiff(
     gitRootDir,
     hyperlinkFileNames = true,
     hyperlinkLineNumbers = true,
+    hideFileHeader = false,
+    omitHunkHeaders = false,
   } = options;
 
   // Create config with options
@@ -93,6 +105,8 @@ export async function formatDiff(
     SYNTAX_HIGHLIGHTING_THEME: syntaxHighlightingTheme,
     HYPERLINK_FILE_NAMES: hyperlinkFileNames,
     HYPERLINK_LINE_NUMBERS: hyperlinkLineNumbers,
+    HIDE_FILE_HEADER: hideFileHeader,
+    OMIT_HUNK_HEADERS: omitHunkHeaders,
   });
 
   // Create context
