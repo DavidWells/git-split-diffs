@@ -23,13 +23,13 @@ const commonOptions = {
 /** @type {esbuild.BuildOptions} */
 const devOptions = {
     ...commonOptions,
-    entryPoints: ['src/index.ts', 'src/benchmark.ts', 'src/previewTheme.ts'],
+    entryPoints: ['src/index.ts', 'src/api.ts', 'src/benchmark.ts', 'src/previewTheme.ts'],
 };
 
 /** @type {esbuild.BuildOptions} */
 const prodOptions = {
     ...commonOptions,
-    entryPoints: ['src/index.ts'],
+    entryPoints: ['src/index.ts', 'src/api.ts'],
     minify: true,
 };
 

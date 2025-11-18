@@ -11,6 +11,15 @@
     "bin": {
         "git-split-diffs": "build/index.mjs"
     },
+    "main": "build/api.mjs",
+    "types": "build/api.d.ts",
+    "exports": {
+        ".": {
+            "import": "./build/api.mjs",
+            "types": "./build/api.d.ts"
+        },
+        "./cli": "./build/index.mjs"
+    },
     "files": [
         "build/*",
         "themes/*.json"

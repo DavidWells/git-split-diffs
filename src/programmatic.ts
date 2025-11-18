@@ -1,0 +1,107 @@
+// Programmatic API for git-split-diffs
+import chalk from 'chalk';
+import terminalSize from 'terminal-size';
+import { Readable, Writable } from 'stream';
+import * as path from 'path';
+import { fileURLToPath } from 'url';
+import { getContextForConfig } from './context';
+import { getConfig } from './getConfig';
+import { transformContentsStreaming } from './transformContentsStreaming';
+
+// Get the directory of the current module
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const THEMES_DIR = path.resolve(__dirname, '../themes');
+
+export interface FormatDiffOptions {
+  /**
+   * Terminal width for formatting. Defaults to current terminal size.
+   */
+  width?: number;
+
+  /**
+   * Minimum line width. Defaults to 80.
+   */
+  minLineWidth?: number;
+
+  /**
+   * Whether to wrap long lines. Defaults to true.
+   */
+  wrapLines?: boolean;
+
+  /**
+   * Whether to highlight line changes. Defaults to true.
+   */
+  highlightLineChanges?: boolean;
+
+  /**
+   * Theme name to use. Defaults to 'dark'.
+   */
+  themeName?: string;
+
+  /**
+   * Syntax highlighting theme. Optional.
+   */
+  syntaxHighlightingTheme?: string;
+}
+
+/**
+ * Format a git diff string with split diffs styling
+ *
+ * @param diffContent - The raw git diff output
+ * @param options - Formatting options
+ * @returns Promise resolving to formatted diff string
+ */
+export async function formatDiff(
+  diffContent: string,
+  options: FormatDiffOptions = {}
+): Promise<string> {
+  const {
+    width = terminalSize().columns,
+    minLineWidth = 80,
+    wrapLines = true,
+    highlightLineChanges = true,
+    themeName = 'dark',
+    syntaxHighlightingTheme,
+  } = options;
+
+  // Create config with options
+  const config = getConfig({
+    THEME_NAME: themeName,
+    THEME_DIRECTORY: THEMES_DIR,
+    MIN_LINE_WIDTH: minLineWidth,
+    WRAP_LINES: wrapLines,
+    HIGHLIGHT_LINE_CHANGES: highlightLineChanges,
+    SYNTAX_HIGHLIGHTING_THEME: syntaxHighlightingTheme,
+  });
+
+  // Create context
+  const context = await getContextForConfig(config, chalk, width);
+
+  // Create readable stream from diff content
+  const inputStream = Readable.from([diffContent]);
+
+  // Capture output to string
+  let output = '';
+  const outputStream = new Writable({
+    write(chunk, encoding, callback) {
+      output += chunk.toString();
+      callback();
+    },
+  });
+
+  // Transform the diff
+  await transformContentsStreaming(context, inputStream, outputStream);
+
+  return output;
+}
+
+/**
+ * Format a git diff with default options
+ *
+ * @param diffContent - The raw git diff output
+ * @returns Promise resolving to formatted diff string
+ */
+export async function formatDiffSimple(diffContent: string): Promise<string> {
+  return formatDiff(diffContent);
+}
