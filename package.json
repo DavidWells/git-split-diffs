@@ -54,7 +54,11 @@
         "test": "cross-env ./node_modules/.bin/tsc && cross-env NODE_OPTIONS=\"--experimental-vm-modules --no-warnings\" ./node_modules/.bin/jest",
         "previewTheme": "nodemon -q build/previewTheme.mjs",
         "benchmark": "npm run build && node build/benchmark.mjs",
-        "prepublishOnly": "npm run lint && npm run build:publish && npm run test"
+        "prepublishOnly": "npm run lint && npm run build:publish && npm run test",
+        "publish": "git push origin && git push origin --tags",
+        "release:patch": "npm version patch && npm publish",
+        "release:minor": "npm version minor && npm publish",
+        "release:major": "npm version major && npm publish"
     },
     "devDependencies": {
         "@eslint/js": "^8.56.0",
