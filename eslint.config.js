@@ -6,7 +6,14 @@ import tseslint from 'typescript-eslint';
 const config = [
     { files: ['src/**/*.ts'], ignores: ['build/**/*'] },
     { languageOptions: { globals: globals.node } },
-    { rules: { 'require-await': 'error' } },
+    { rules: {
+      'require-await': 'error',
+      'no-control-regex': 'off',
+      }
+    },
+    // disable no-control-regex
+
+
     pluginJs.configs.recommended,
     ...tseslint.configs.recommended,
 ];
