@@ -159,13 +159,43 @@ export function parseColorDefinition(definition: ColorDefinition): ThemeColor {
     };
 }
 
+// Embedded dark theme for bundled binary environments (Bun, pkg, etc)
+const EMBEDDED_DARK_THEME: ThemeDefinition = {
+    SYNTAX_HIGHLIGHTING_THEME: 'dark-plus',
+    DEFAULT_COLOR: { color: '#ffffff', backgroundColor: '#2b2b2b' },
+    COMMIT_HEADER_COLOR: { color: '#cccccc' },
+    COMMIT_HEADER_LABEL_COLOR: { color: '#00000022' },
+    COMMIT_SHA_COLOR: { color: '#00eeaa' },
+    COMMIT_AUTHOR_COLOR: { color: '#00aaee' },
+    COMMIT_DATE_COLOR: { color: '#cccccc' },
+    COMMIT_MESSAGE_COLOR: { color: '#cccccc' },
+    COMMIT_TITLE_COLOR: { modifiers: ['bold'] },
+    FILE_NAME_COLOR: { color: '#ffdd99' },
+    BORDER_COLOR: { color: '#ffdd9966', modifiers: ['dim'] },
+    HUNK_HEADER_COLOR: { modifiers: ['dim'] },
+    DELETED_WORD_COLOR: { color: '#ffcccc', backgroundColor: '#ff000033' },
+    INSERTED_WORD_COLOR: { color: '#ccffcc', backgroundColor: '#00ff0033' },
+    DELETED_LINE_NO_COLOR: { color: '#00000022', backgroundColor: '#00000022' },
+    INSERTED_LINE_NO_COLOR: { color: '#00000022', backgroundColor: '#00000022' },
+    UNMODIFIED_LINE_NO_COLOR: { color: '#666666' },
+    DELETED_LINE_COLOR: { color: '#cc6666', backgroundColor: '#3a3030' },
+    INSERTED_LINE_COLOR: { color: '#66cc66', backgroundColor: '#303a30' },
+    UNMODIFIED_LINE_COLOR: {},
+    MISSING_LINE_COLOR: {},
+};
+
 function loadThemeDefinition(
     themesDir: string,
     themeName: string
 ): ThemeDefinition {
-    return JSON.parse(
-        fs.readFileSync(path.join(themesDir, `${themeName}.json`)).toString()
-    ) as ThemeDefinition;
+    try {
+        return JSON.parse(
+            fs.readFileSync(path.join(themesDir, `${themeName}.json`)).toString()
+        ) as ThemeDefinition;
+    } catch {
+        // Fallback to embedded dark theme (for bundled binaries)
+        return EMBEDDED_DARK_THEME;
+    }
 }
 
 export function loadTheme(themesDir: string, themeName: string): Theme {
