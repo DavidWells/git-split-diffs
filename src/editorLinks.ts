@@ -9,7 +9,7 @@ export function hyperlinkSupported(
 	stream: WriteStream = process.stdout,
 ): boolean {
 	const helper = supportsHyperlinks as unknown as {
-		stdout?: (s: WriteStream) => boolean;
+		stdout?: boolean | ((s: WriteStream) => boolean);
 		default?: (s: WriteStream) => boolean;
 	};
 	try {
@@ -18,7 +18,9 @@ export function hyperlinkSupported(
 				(supportsHyperlinks as (s: WriteStream) => boolean)(stream),
 			);
 		}
-		if (helper.stdout) return Boolean(helper.stdout(stream));
+		// supports-hyperlinks@4.x exports pre-evaluated booleans, not functions
+		if (typeof helper.stdout === "boolean") return helper.stdout;
+		if (typeof helper.stdout === "function") return Boolean(helper.stdout(stream));
 		if (helper.default && typeof helper.default === "function")
 			return Boolean(helper.default(stream));
 	} catch {
