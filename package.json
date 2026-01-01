@@ -61,6 +61,7 @@
         "release:major": "npm version major && npm publish"
     },
     "devDependencies": {
+        "@davidwells/box-logger": "^2.0.8",
         "@eslint/js": "^8.56.0",
         "@types/benchmark": "^2.1.0",
         "@types/diff": "^5.0.0",
