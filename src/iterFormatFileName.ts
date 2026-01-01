@@ -16,6 +16,8 @@ export function* iterFormatFileName(
         FILE_NAME_COLOR,
         SCREEN_WIDTH,
         HIDE_FILE_HEADER,
+        HIDE_HEADER_TOP_LINE,
+        HIDE_HEADER_BOTTOM_LINE,
     } = context;
 
     // If hiding file header, return early
@@ -23,35 +25,41 @@ export function* iterFormatFileName(
         return;
     }
 
-    yield HORIZONTAL_SEPARATOR;
+    if (HIDE_HEADER_TOP_LINE) {
+        yield T().fillWidth(SCREEN_WIDTH, ' ')
+    } else {
+        yield HORIZONTAL_SEPARATOR;
+    }
 
     const formattedString = T().appendString(' ■■ ');
 
     // Calculate the display text (without link markers) to determine visual width
+    // Only apply LINE_COLOR to indicators (for foreground) - backgrounds come from LINE_NO_COLOR
+    const stripBg = (c: typeof DELETED_LINE_COLOR) => ({ ...c, backgroundColor: undefined })
     let displayText;
     if (!fileNameA) {
         formattedString
             .addSpan(1, 3, INSERTED_LINE_NO_COLOR)
-            .addSpan(1, 3, INSERTED_LINE_COLOR);
+            .addSpan(1, 3, stripBg(INSERTED_LINE_COLOR));
         displayText = fileNameB;
     } else if (!fileNameB) {
         formattedString
             .addSpan(1, 3, DELETED_LINE_NO_COLOR)
-            .addSpan(1, 3, DELETED_LINE_COLOR);
+            .addSpan(1, 3, stripBg(DELETED_LINE_COLOR));
         displayText = fileNameA;
     } else if (fileNameA === fileNameB) {
         formattedString
             .addSpan(1, 2, DELETED_LINE_NO_COLOR)
             .addSpan(2, 3, INSERTED_LINE_NO_COLOR)
-            .addSpan(1, 2, DELETED_LINE_COLOR)
-            .addSpan(2, 3, INSERTED_LINE_COLOR);
+            .addSpan(1, 2, stripBg(DELETED_LINE_COLOR))
+            .addSpan(2, 3, stripBg(INSERTED_LINE_COLOR));
         displayText = fileNameA;
     } else {
         formattedString
             .addSpan(1, 2, DELETED_LINE_NO_COLOR)
             .addSpan(2, 3, INSERTED_LINE_NO_COLOR)
-            .addSpan(1, 2, DELETED_LINE_COLOR)
-            .addSpan(2, 3, INSERTED_LINE_COLOR);
+            .addSpan(1, 2, stripBg(DELETED_LINE_COLOR))
+            .addSpan(2, 3, stripBg(INSERTED_LINE_COLOR));
         displayText = `${fileNameA} -> ${fileNameB}`;
     }
 
@@ -105,5 +113,9 @@ export function* iterFormatFileName(
     formattedString.addSpan(0, totalLength, FILE_NAME_COLOR);
     yield formattedString;
 
-    yield HORIZONTAL_SEPARATOR;
+    if (HIDE_HEADER_BOTTOM_LINE) {
+        yield T().fillWidth(SCREEN_WIDTH, ' ')
+    } else {
+        yield HORIZONTAL_SEPARATOR;
+    }
 }
