@@ -11,6 +11,8 @@ export type Config = Theme & {
     HIDE_FILE_HEADER?: boolean;
     OMIT_HUNK_HEADERS?: boolean;
     TRIM_LAST_EMPTY_LINE?: boolean;
+    HIDE_HEADER_TOP_LINE?: boolean;
+    HIDE_HEADER_BOTTOM_LINE?: boolean;
 };
 
 export const CONFIG_DEFAULTS: Omit<Config, keyof Theme> = {

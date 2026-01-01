@@ -17,6 +17,8 @@ const DEFAULT_CONFIG: GitConfig = {
     HIDE_FILE_HEADER: false,
     OMIT_HUNK_HEADERS: false,
     TRIM_LAST_EMPTY_LINE: true,
+    HIDE_HEADER_TOP_LINE: false,
+    HIDE_HEADER_BOTTOM_LINE: false,
 };
 
 describe('getGitConfig', () => {
@@ -46,6 +48,8 @@ split-diffs.syntax-highlighting-theme=dark-plus
             HIDE_FILE_HEADER: false,
             OMIT_HUNK_HEADERS: false,
             TRIM_LAST_EMPTY_LINE: true,
+            HIDE_HEADER_TOP_LINE: false,
+            HIDE_HEADER_BOTTOM_LINE: false,
         });
     });
 

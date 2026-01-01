@@ -13,6 +13,8 @@ export type GitConfig = {
     HIDE_FILE_HEADER?: boolean;
     OMIT_HUNK_HEADERS?: boolean;
     TRIM_LAST_EMPTY_LINE?: boolean;
+    HIDE_HEADER_TOP_LINE?: boolean;
+    HIDE_HEADER_BOTTOM_LINE?: boolean;
 };
 
 export const DEFAULT_MIN_LINE_WIDTH = 80;
@@ -67,5 +69,7 @@ export function getGitConfig(configString: string): GitConfig {
         HIDE_FILE_HEADER: rawConfig['hide-file-header'] === 'true',
         OMIT_HUNK_HEADERS: rawConfig['omit-hunk-headers'] === 'true',
         TRIM_LAST_EMPTY_LINE: rawConfig['trim-last-empty-line'] !== 'false',
+        HIDE_HEADER_TOP_LINE: rawConfig['hide-header-top-line'] === 'true',
+        HIDE_HEADER_BOTTOM_LINE: rawConfig['hide-header-bottom-line'] === 'true',
     };
 }
