@@ -73,6 +73,22 @@ export interface FormatDiffOptions {
    * Whether to trim trailing empty lines from hunks. Defaults to true.
    */
   trimLastEmptyLine?: boolean;
+
+  /**
+   * Whether to disable the default background color. Useful for CI environments
+   * where ANSI backgrounds render incorrectly. Keeps red/green diff backgrounds.
+   */
+  disableDefaultBackground?: boolean;
+
+  /**
+   * Whether to hide the top separator line above the filename. Defaults to false.
+   */
+  hideHeaderTopLine?: boolean;
+
+  /**
+   * Whether to hide the bottom separator line below the filename. Defaults to false.
+   */
+  hideHeaderBottomLine?: boolean;
 }
 
 /**
@@ -86,8 +102,11 @@ export async function formatDiff(
   diffContent: string,
   options: FormatDiffOptions = {}
 ): Promise<string> {
+  // Get terminal dimensions for max width constraint
+  const termWidth = terminalSize().columns
+
   const {
-    width = terminalSize().columns,
+    width: requestedWidth = termWidth,
     minLineWidth = 80,
     wrapLines = true,
     highlightLineChanges = true,
@@ -99,7 +118,13 @@ export async function formatDiff(
     hideFileHeader = false,
     omitHunkHeaders = false,
     trimLastEmptyLine = true,
-  } = options;
+    disableDefaultBackground = false,
+    hideHeaderTopLine = false,
+    hideHeaderBottomLine = false,
+  } = options
+
+  // Clamp width to terminal size to prevent overflow
+  const width = Math.min(requestedWidth, termWidth)
 
   // Create config with options
   const config = getConfig({
@@ -114,7 +139,17 @@ export async function formatDiff(
     HIDE_FILE_HEADER: hideFileHeader,
     OMIT_HUNK_HEADERS: omitHunkHeaders,
     TRIM_LAST_EMPTY_LINE: trimLastEmptyLine,
-  });
+    HIDE_HEADER_TOP_LINE: hideHeaderTopLine,
+    HIDE_HEADER_BOTTOM_LINE: hideHeaderBottomLine,
+  })
+
+  // Strip default background color for CI environments where it renders incorrectly
+  if (disableDefaultBackground) {
+    const stripBg = (c: typeof config.DEFAULT_COLOR) => ({ ...c, backgroundColor: undefined })
+    config.DEFAULT_COLOR = stripBg(config.DEFAULT_COLOR)
+    config.DELETED_LINE_NO_COLOR = stripBg(config.DELETED_LINE_NO_COLOR)
+    config.INSERTED_LINE_NO_COLOR = stripBg(config.INSERTED_LINE_NO_COLOR)
+  }
 
   // Create context
   const context = await getContextForConfig(config, chalk, width, gitRootDir);
