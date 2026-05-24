@@ -17,6 +17,23 @@ export type Context = Config & {
     HYPERLINK_SUPPORTED: boolean;
 };
 
+const highlighterCache = new Map<
+    shiki.BundledTheme,
+    Promise<shiki.Highlighter>
+>();
+
+function getHighlighter(theme: shiki.BundledTheme): Promise<shiki.Highlighter> {
+    let highlighter = highlighterCache.get(theme);
+    if (!highlighter) {
+        highlighter = shiki.createHighlighter({
+            themes: [theme],
+            langs: [],
+        });
+        highlighterCache.set(theme, highlighter);
+    }
+    return highlighter;
+}
+
 export async function getContextForConfig(
     config: Config,
     chalk: ChalkInstance,
@@ -31,10 +48,7 @@ export async function getContextForConfig(
 
     let HIGHLIGHTER = undefined;
     if (config.SYNTAX_HIGHLIGHTING_THEME) {
-        HIGHLIGHTER = await shiki.createHighlighter({
-            themes: [config.SYNTAX_HIGHLIGHTING_THEME],
-            langs: [],
-        });
+        HIGHLIGHTER = await getHighlighter(config.SYNTAX_HIGHLIGHTING_THEME);
     }
     return {
         ...config,
