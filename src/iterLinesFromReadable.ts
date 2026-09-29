@@ -1,7 +1,5 @@
 import * as stream from 'stream';
 
-const NEWLINE_REGEX = /\n/g;
-
 /**
  * Given a string, yields each part in the string terminated by a newline and
  * returns the final part without a newline.
@@ -11,9 +9,13 @@ function* yieldLinesFromString(string: string) {
     // sometimes emit ansi color codes between \r and \n.
     string = string.replace(/\r/g, '');
 
+    // A fresh /g regex per call: its lastIndex is exec state, and this
+    // generator yields mid-loop, so a shared one is corrupted by any other
+    // diff formatting at the same time (concurrent formatDiff calls).
+    const newlineRegex = /\n/g;
     let lastIndex = 0;
     let match: RegExpExecArray | null;
-    while ((match = NEWLINE_REGEX.exec(string))) {
+    while ((match = newlineRegex.exec(string))) {
         yield string.slice(lastIndex, match.index);
         lastIndex = match.index + match[0].length;
     }

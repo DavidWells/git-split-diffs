@@ -83,3 +83,20 @@ test('fuzz', async () => {
 
     expect(await toLines(chunks)).toEqual(lines);
 });
+
+test('interleaved iterators keep their own position', async () => {
+    // Two streams split concurrently (like two formatDiff calls at once):
+    // each must see its own lines no matter how their steps interleave.
+    const a = iterlinesFromReadable(Readable.from(['a1\na2\na3\na4']))[Symbol.asyncIterator]();
+    const b = iterlinesFromReadable(Readable.from(['b1\nb2\nb3\nb4']))[Symbol.asyncIterator]();
+    const gotA: string[] = [];
+    const gotB: string[] = [];
+    for (;;) {
+        const [ra, rb] = await Promise.all([a.next(), b.next()]);
+        if (!ra.done) gotA.push(ra.value);
+        if (!rb.done) gotB.push(rb.value);
+        if (ra.done && rb.done) break;
+    }
+    expect(gotA).toEqual(['a1', 'a2', 'a3', 'a4']);
+    expect(gotB).toEqual(['b1', 'b2', 'b3', 'b4']);
+});
