@@ -71,11 +71,12 @@ async function transform(
         ...TEST_CONFIG,
         ...config,
     };
-    const context = await getContextForConfig(
-        testConfig,
-        TEST_CHALK,
-        SCREEN_WIDTH
-    );
+    const context = {
+        ...(await getContextForConfig(testConfig, TEST_CHALK, SCREEN_WIDTH)),
+        // Snapshots are recorded without OSC 8 links; don't let the terminal
+        // running the tests (one that supports hyperlinks) change the output.
+        HYPERLINK_SUPPORTED: false,
+    };
 
     let string = '';
     await transformContentsStreaming(
