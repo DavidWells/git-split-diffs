@@ -91,6 +91,25 @@ export interface FormatDiffOptions {
   hideHeaderBottomLine?: boolean;
 }
 
+// With no TTY on stdout/stderr and no COLUMNS/LINES (CI, piped output), terminal-size
+// spawns tput (and resize on Linux) on every call: ~6ms of blocking processes per
+// formatDiff. That answer is kept for the process, like git-er-done's term-size;
+// TTY sizes are still read on every call, so they follow resizes.
+let spawnedTermSize: { columns: number; rows: number } | undefined;
+
+function getTerminalSize(): { columns: number; rows: number } {
+  const { env, stdout, stderr } = process;
+  if (
+    (stdout?.columns && stdout?.rows) ||
+    (stderr?.columns && stderr?.rows) ||
+    (env['COLUMNS'] && env['LINES'])
+  ) {
+    return terminalSize();
+  }
+  if (!spawnedTermSize) spawnedTermSize = terminalSize();
+  return spawnedTermSize;
+}
+
 /**
  * Format a git diff string with split diffs styling
  *
@@ -103,7 +122,7 @@ export async function formatDiff(
   options: FormatDiffOptions = {}
 ): Promise<string> {
   // Get terminal dimensions for max width constraint
-  const termWidth = terminalSize().columns
+  const termWidth = getTerminalSize().columns
 
   const {
     width: requestedWidth = termWidth,
