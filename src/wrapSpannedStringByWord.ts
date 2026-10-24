@@ -64,10 +64,8 @@ function getLineBreaksForString(
     // Add one word at a time
     while (curIndex < string.length) {
         const isSpace = SPACE_REGEX.test(string[curIndex]);
-        if (isSpace) {
-            pushWord(prevIndex, curIndex);
-            prevIndex = curIndex;
-        } else if (prevIsSpace) {
+        // A space, or the first char after spaces, starts a new word
+        if (isSpace || prevIsSpace) {
             pushWord(prevIndex, curIndex);
             prevIndex = curIndex;
         }

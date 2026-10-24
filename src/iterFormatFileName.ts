@@ -47,20 +47,14 @@ export function* iterFormatFileName(
             .addSpan(1, 3, DELETED_LINE_NO_COLOR)
             .addSpan(1, 3, stripBg(DELETED_LINE_COLOR));
         displayText = fileNameA;
-    } else if (fileNameA === fileNameB) {
-        formattedString
-            .addSpan(1, 2, DELETED_LINE_NO_COLOR)
-            .addSpan(2, 3, INSERTED_LINE_NO_COLOR)
-            .addSpan(1, 2, stripBg(DELETED_LINE_COLOR))
-            .addSpan(2, 3, stripBg(INSERTED_LINE_COLOR));
-        displayText = fileNameA;
     } else {
         formattedString
             .addSpan(1, 2, DELETED_LINE_NO_COLOR)
             .addSpan(2, 3, INSERTED_LINE_NO_COLOR)
             .addSpan(1, 2, stripBg(DELETED_LINE_COLOR))
             .addSpan(2, 3, stripBg(INSERTED_LINE_COLOR));
-        displayText = `${fileNameA} -> ${fileNameB}`;
+        displayText =
+            fileNameA === fileNameB ? fileNameA : `${fileNameA} -> ${fileNameB}`;
     }
 
     // Calculate visual width BEFORE adding link markers
@@ -78,19 +72,7 @@ export function* iterFormatFileName(
     let fileNameLabel;
     const shouldHyperlink = context.HYPERLINK_FILE_NAMES !== false && context.HYPERLINK_SUPPORTED;
 
-    if (!fileNameA) {
-        fileNameLabel = shouldHyperlink
-            ? createFileLink(fileNameB, context.GIT_ROOT)
-            : fileNameB;
-    } else if (!fileNameB) {
-        fileNameLabel = shouldHyperlink
-            ? createFileLink(fileNameA, context.GIT_ROOT)
-            : fileNameA;
-    } else if (fileNameA === fileNameB) {
-        fileNameLabel = shouldHyperlink
-            ? createFileLink(fileNameA, context.GIT_ROOT)
-            : fileNameA;
-    } else {
+    if (fileNameA && fileNameB && fileNameA !== fileNameB) {
         if (shouldHyperlink) {
             const linkA = createFileLink(fileNameA, context.GIT_ROOT);
             const linkB = createFileLink(fileNameB, context.GIT_ROOT);
@@ -98,6 +80,12 @@ export function* iterFormatFileName(
         } else {
             fileNameLabel = `${fileNameA} -> ${fileNameB}`;
         }
+    } else {
+        // Added (no A), deleted (no B) or same name: one file
+        const fileName = fileNameA || fileNameB;
+        fileNameLabel = shouldHyperlink
+            ? createFileLink(fileName, context.GIT_ROOT)
+            : fileName;
     }
 
     formattedString.appendString(fileNameLabel);

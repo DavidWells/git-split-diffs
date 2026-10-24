@@ -86,23 +86,17 @@ export function replaceEditorLinks(text: string): string {
     // (?:\x1b\[[0-9;]*m)? optionally matches ANSI color codes
     const ansiPattern = '(?:[\\s\\S]|(?:\\x1b\\[[0-9;]*m))+?';
 
-    // Replace file links - pattern handles ANSI codes between delimiters
-    const fileLinkRegex = new RegExp(`__FILE_LINK__(${ansiPattern})__(${ansiPattern})__FILE_LINK_END__`, 'g');
-    text = text.replace(fileLinkRegex, (match, url, display) => {
-        // Strip ANSI codes from url and display to get clean values
-        const cleanUrl = url.replace(/\x1b\[[0-9;]*m/g, '');
-        const cleanDisplay = display.replace(/\x1b\[[0-9;]*m/g, '');
-        return `\x1b]8;;${cleanUrl}\x1b\\${cleanDisplay}\x1b]8;;\x1b\\`;
-    });
-
-    // Replace editor links (for line numbers)
-    const editorLinkRegex = new RegExp(`__EDITOR_LINK__(${ansiPattern})__(${ansiPattern})__EDITOR_LINK_END__`, 'g');
-    text = text.replace(editorLinkRegex, (match, url, display) => {
-        // Strip ANSI codes from url and display to get clean values
-        const cleanUrl = url.replace(/\x1b\[[0-9;]*m/g, '');
-        const cleanDisplay = display.replace(/\x1b\[[0-9;]*m/g, '');
-        return `\x1b]8;;${cleanUrl}\x1b\\${cleanDisplay}\x1b]8;;\x1b\\`;
-    });
+    // Replace file links, then editor links (for line numbers) - pattern
+    // handles ANSI codes between delimiters
+    for (const marker of ['FILE_LINK', 'EDITOR_LINK']) {
+        const linkRegex = new RegExp(`__${marker}__(${ansiPattern})__(${ansiPattern})__${marker}_END__`, 'g');
+        text = text.replace(linkRegex, (match, url, display) => {
+            // Strip ANSI codes from url and display to get clean values
+            const cleanUrl = url.replace(/\x1b\[[0-9;]*m/g, '');
+            const cleanDisplay = display.replace(/\x1b\[[0-9;]*m/g, '');
+            return `\x1b]8;;${cleanUrl}\x1b\\${cleanDisplay}\x1b]8;;\x1b\\`;
+        });
+    }
 
     return text;
 }
