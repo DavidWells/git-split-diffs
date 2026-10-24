@@ -47,13 +47,10 @@ export function getGitConfig(configString: string): GitConfig {
     const rawConfig = extractFromGitConfigString(configString);
 
     let minLineWidth = DEFAULT_MIN_LINE_WIDTH;
-    try {
-        const parsedMinLineWidth = parseInt(rawConfig['min-line-width'], 10);
-        if (!isNaN(parsedMinLineWidth)) {
-            minLineWidth = parsedMinLineWidth;
-        }
-    } catch {
-        // Ignore invalid values
+    // Invalid values parse to NaN and keep the default
+    const parsedMinLineWidth = parseInt(rawConfig['min-line-width'], 10);
+    if (!isNaN(parsedMinLineWidth)) {
+        minLineWidth = parsedMinLineWidth;
     }
 
     return {
